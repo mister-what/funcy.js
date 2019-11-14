@@ -1,6 +1,8 @@
-import { createHook, useRenderer } from "../export_core.js";
-import { html, render } from "../../node_modules/htm/preact/standalone.mjs";
-export const usePreactHtm = createHook("usePreactHtm", () => {
+import { useRenderer } from "../hooks/use_renderer";
+import { pocus } from "hookuspocus/src";
+import { html, render } from "htm/preact/standalone";
+
+export const usePreactHtm = pocus(() => {
   useRenderer((view, shadowRoot) => {
     render(view, shadowRoot);
   });

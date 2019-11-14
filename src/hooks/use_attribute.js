@@ -1,17 +1,12 @@
-"use strict";
-import { createHook } from "../../node_modules/hookuspocus/dist-src/index.js";
+import { hookus } from "hookuspocus/src";
 
-export const useAttribute = createHook(
-  "useAttribute",
-  (attributeName, { getContext }) => {
-    const element = getContext();
-    const attributeValue = element.getAttribute(attributeName);
-    return [
-      attributeValue,
-      value => {
-        element.skipQueue = true;
-        element.setAttribute(attributeName, value);
-      }
-    ];
-  }
-);
+export const useAttribute = hookus(({ context: element }, attributeName) => {
+  const attributeValue = element.getAttribute(attributeName);
+  return [
+    attributeValue,
+    value => {
+      element.skipQueue = true;
+      element.setAttribute(attributeName, value);
+    }
+  ];
+});

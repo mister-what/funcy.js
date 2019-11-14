@@ -1,33 +1,39 @@
-"use strict";
-import {
-  createHook,
-  useEffect
-} from "../../node_modules/hookuspocus/dist-src/index.js";
+import { hookus, useEffect, useState } from "hookuspocus/src";
 
-export const useCSS = createHook("useCSS", (parts, ...slots) => {
-  const { getContext } = slots.pop();
-  let styles;
-  if (parts instanceof Array) {
-    styles = parts
-      .map((part, index) => {
-        if (slots[index]) {
-          return part + slots[index];
-        } else {
-          return part;
-        }
-      })
-      .join("");
-  } else {
-    styles = parts;
-  }
-  styles = styles.replace(/ +(?= )/g, "").replace(/\n/g, "");
-  const shadowRoot = getContext()._shadowRoot;
-  const style = document.createElement("style");
-  style.innerHTML = styles;
+export const useCSS = hookus(({ context }, parts, ...slots) => {
+  if (!Array.isArray(parts) || typeof parts !== "string")
+    throw new TypeError("Argument 1 must have type of string");
+  const styles = (Array.isArray(parts)
+    ? parts
+        .map((part, index) => {
+          if (slots[index] != null) {
+            return part + slots[index];
+          } else {
+            return part;
+          }
+        })
+        .join("")
+    : parts
+  ).replace(/\s+/gm, " ");
+
+  const { _shadowRoot: shadowRoot } = context;
+  const [styleElement, setStyleElement] = useState(null);
+
   useEffect(() => {
-    shadowRoot.appendChild(style);
-    return () => {
-      shadowRoot.removeChild(style);
-    };
-  });
+    if (!styleElement) {
+      setStyleElement(document.createElement("style"));
+    }
+    if (styleElement) {
+      shadowRoot.appendChild(styleElement);
+      return () => {
+        styleElement.remove();
+      };
+    }
+  }, [styleElement]);
+
+  useEffect(() => {
+    if (styleElement) {
+      styleElement.innerHTML = styles;
+    }
+  }, [styleElement, styles]);
 });

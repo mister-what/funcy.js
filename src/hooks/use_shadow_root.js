@@ -1,6 +1,3 @@
-"use strict";
-import { createHook } from "../../node_modules/hookuspocus/dist-src/index.js";
+import { hookus } from "hookuspocus/src";
 
-export const useShadowRoot = createHook("useShadowRoot", ({ getContext }) => {
-  return getContext()._shadowRoot;
-});
+export const useShadowRoot = hookus(({ context: element }) => element._shadowRoot);

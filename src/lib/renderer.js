@@ -1,5 +1,4 @@
-"use strict";
-import { pocus } from "../../node_modules/hookuspocus/dist-src/index.js";
+import { pocus } from "hookuspocus/src";
 const passPropsMap = new Map();
 let rendering = false;
 const renderQueue = [];

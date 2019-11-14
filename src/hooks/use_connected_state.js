@@ -1,10 +1,5 @@
-"use strict";
-import { createHook } from "../../node_modules/hookuspocus/dist-src/index.js";
+import { hookus } from "hookuspocus/src";
 
-export const useConnectedState = createHook(
-  "useConnectedState",
-  ({ getContext }) => {
-    const element = getContext();
-    return element._isConnected;
-  }
+export const useConnectedState = hookus(
+  ({ context: element }) => element._isConnected
 );
