@@ -1,5 +1,5 @@
 import { queueRender, defaultRenderer, getPassableProps } from "./renderer";
-import { onStateChanged, pocus } from "hookuspocus/src";
+import { onStateChanged, fidibus } from "hookuspocus/src";
 
 const componentMap = new Map();
 
@@ -34,7 +34,7 @@ function addComponent(name, options = {}) {
     }
     destroy() {
       this.parentElement.removeChild(this);
-      dispose(this);
+      //dispose(this);
     }
     async render() {
       const propsId = this.getAttribute("data-props");
@@ -43,9 +43,8 @@ function addComponent(name, options = {}) {
         this.skipQueue = true;
         this.removeAttribute("data-props");
       }
-      const view = await Promise.resolve().then(() =>
-        pocus([this._props], componentMap.get(name), this)
-      );
+      const wrapped = fidibus(componentMap.get(name), this);
+      const view = await Promise.resolve().then(() => wrapped(this._props));
       await this._renderer(view, this._shadowRoot);
       this.init = false;
     }
