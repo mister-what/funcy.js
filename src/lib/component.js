@@ -1,29 +1,24 @@
-"use strict";
-import { queueRender, defaultRenderer, getPassableProps } from "./renderer.js";
-import {
-  dispose,
-  hookus
-} from "../../node_modules/hookuspocus/dist-src/index.js";
-export { prps } from "./renderer.js";
+import { queueRender, defaultRenderer, getPassableProps } from "./renderer";
+import { onStateChanged, fidibus } from "hookuspocus/src";
+
 const componentMap = new Map();
+
 function addComponent(name, options = {}) {
-  class Component extends HTMLElement {
+  const { BaseElement = HTMLElement } = options;
+  class Component extends BaseElement {
     constructor() {
       super();
       this._props = {};
       this._renderer = defaultRenderer;
       this._isConnected = false;
-      hookus(this, (name, value, oldValue) => {
-        if (name === "useReducer" && value !== oldValue) {
-          queueRender(element);
-        }
-      });
+      onStateChanged(queueRender);
     }
     connectedCallback() {
       if (!this._shadowRoot) {
+        const { shadowOptions } = options;
         this._shadowRoot = this.attachShadow({
           mode: "open",
-          ...(options.shadowOptions ? options.shadowOptions : {})
+          ...shadowOptions
         });
       }
       if (!this._isConnected) {
@@ -39,7 +34,7 @@ function addComponent(name, options = {}) {
     }
     destroy() {
       this.parentElement.removeChild(this);
-      dispose(this);
+      //dispose(this);
     }
     async render() {
       const propsId = this.getAttribute("data-props");
@@ -48,9 +43,8 @@ function addComponent(name, options = {}) {
         this.skipQueue = true;
         this.removeAttribute("data-props");
       }
-      const view = await Promise.resolve().then(() =>
-        componentMap.get(name)(this._props)
-      );
+      const wrapped = fidibus(componentMap.get(name), this);
+      const view = await Promise.resolve().then(() => wrapped(this._props));
       await this._renderer(view, this._shadowRoot);
       this.init = false;
     }

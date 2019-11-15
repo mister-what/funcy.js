@@ -1,8 +1,9 @@
-import { createHook, useRenderer } from "../export_core.js";
-import { html, render } from "../../node_modules/htm/preact/standalone.mjs";
-export const usePreactHtm = createHook("usePreactHtm", () => {
+import { useRenderer } from "./use_renderer";
+import { html, render } from "htm/preact/standalone";
+
+export const usePreactHtm = () => {
   useRenderer((view, shadowRoot) => {
     render(view, shadowRoot);
   });
   return html;
-});
+};
